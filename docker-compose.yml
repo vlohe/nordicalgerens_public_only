@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  demo1:
+    container_name: demo1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    restart: unless-stopped
