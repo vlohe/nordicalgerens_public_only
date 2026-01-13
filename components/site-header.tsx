@@ -45,7 +45,7 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const headerClassName = "absolute top-0 left-0 right-0 z-50";
+  const headerClassName = "fixed top-0 left-0 right-0 z-50";
 
   const navLinkClassName = isHome || isMarketingPage
     ? "text-lg font-semibold tracking-wide text-white/90 hover:text-white transition-colors whitespace-nowrap drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]"
@@ -61,16 +61,25 @@ export function SiteHeader() {
 
   return (
     <header className={headerClassName}>
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
+      <div className="relative">
+        {/* Blur background for navbar */}
+        <div className="absolute inset-0 backdrop-blur-md"></div>
+        {/* Fade-out blur effect below navbar only */}
+        <div className="absolute top-full left-0 right-0 h-6 backdrop-blur-md pointer-events-none" style={{
+          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.5) 65%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.15) 90%, rgba(0,0,0,0.05) 95%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.5) 65%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.15) 90%, rgba(0,0,0,0.05) 95%, rgba(0,0,0,0) 100%)'
+        }}></div>
+        {/* Navbar content on top */}
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20" aria-label="Top">
         <div className="flex h-20 items-center justify-between md:grid md:grid-cols-3">
-          <div className="flex items-center mt-2">
-            <Link href="/" className="flex items-center">
+          <div className="flex items-center mt-2 relative z-30">
+            <Link href="/" className="flex items-center relative z-30">
               <Image 
                 src="/images/logo.png" 
                 alt="Nordic Algerens" 
                 width={200} 
                 height={60}
-                className="h-16 sm:h-20 lg:h-24 w-auto"
+                className="h-16 sm:h-20 lg:h-24 w-auto relative z-30"
               />
             </Link>
           </div>
@@ -105,7 +114,7 @@ export function SiteHeader() {
               {servicesMenuOpen && (
                 <div
                   role="menu"
-                  className="absolute left-1/2 -translate-x-1/2 pt-2 w-56"
+                  className="absolute left-1/2 -translate-x-1/2 pt-2 w-56 z-30"
                 >
                   <div className="rounded-md border border-white/30 bg-white/85 backdrop-blur shadow-lg py-2">
                     {servicesNavigation.map((item) => (
@@ -143,7 +152,7 @@ export function SiteHeader() {
               {infoMenuOpen && (
                 <div
                   role="menu"
-                  className="absolute left-1/2 -translate-x-1/2 pt-2 w-56"
+                  className="absolute left-1/2 -translate-x-1/2 pt-2 w-56 z-30"
                 >
                   <div className="rounded-md border border-white/30 bg-white/85 backdrop-blur shadow-lg py-2">
                     {infoNavigation.map((item) => (
@@ -275,7 +284,8 @@ export function SiteHeader() {
             </a>
           </div>
         )}
-      </nav>
+        </nav>
+      </div>
     </header>
   );
 }
