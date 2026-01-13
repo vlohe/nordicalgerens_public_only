@@ -152,9 +152,7 @@ export const services: Service[] = [
         price: "1500,-",
         features: [
           "1-2 plans villa op til 140 m²",
-          "Grundig bekæmpelse i mod edderkopper, spind og pupper",
-          "Op til 140 m²",
-          "kr. 200,- ved 2 plan"
+          "Grundig bekæmpelse i mod edderkopper, spind og pupper"
         ]
       },
       {
@@ -162,9 +160,7 @@ export const services: Service[] = [
         price: "1700,-",
         features: [
           "1-2 plans villa op til 200 m²",
-          "Grundig bekæmpelse i mod edderkopper, spind og pupper",
-          "Op til 200 m²",
-          "kr. 200,- ved 2 plan"
+          "Grundig bekæmpelse i mod edderkopper, spind og pupper"
         ],
         popular: true
       },

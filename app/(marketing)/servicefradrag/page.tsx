@@ -6,27 +6,31 @@ export default function ServicefradragPage() {
   const steps = [
     {
       title: "1. Bestil ydelsen",
-      description: "Kontakt os og bestil den ønskede service. Husk at oplyse, at du ønsker servicefradrag.",
+      description: "Kontakt os og bestil den ønskede service. Vi leverer en faktura med vores CVR-nummer.",
     },
     {
       title: "2. Vi udfører arbejdet",
       description: "Vores professionelle team udfører arbejdet som aftalt.",
     },
     {
-      title: "3. Modtag faktura",
-      description: "Du modtager en specificeret faktura med arbejdsløn og materialer adskilt.",
+      title: "3. Betal og gem dokumentation",
+      description: "Betal fakturaen med dankort, MobilePay eller netbank, og gem dokumentationen for det udførte arbejde.",
     },
     {
-      title: "4. Betal og få fradrag",
-      description: "Betal fakturaen, og fradraget trækkes automatisk fra dit skattekort.",
+      title: "4. Oplys fradraget selv",
+      description: "Du skal selv logge på TastSelv og oplyse dit servicefradrag under 'Håndværkerfradrag og Servicefradrag'. Vi håndterer ikke servicefradrag for dig.",
     },
   ];
 
   const eligibleServices = [
-    "Algebehandling af facade og tag",
-    "Rensning af fliser og belægning",
-    "Tagrenderens og vedligeholdelse",
-    "Almindelig rengøring og vedligeholdelse",
+    "Fliserensning af terrasser, indkørsler m.v. (giver fradrag fra 2025)",
+    "Rensning af tagrender (giver fradrag fra 2025)",
+    "Græsslåning, klipning af hæk, lugning og beskæring",
+    "Snerydning inkl. saltning",
+    "Rengøring og vinduespudsning",
+    "Børnepasning i hjemmet",
+    "Installation af tyverialarm (fra 2025)",
+    "Reparation af hårde hvidevarer (fra 2025)",
   ];
 
   return (
@@ -46,13 +50,26 @@ export default function ServicefradragPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center motion-reduce:animate-none animate-slide-in-left">
           <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">Servicefradrag</h1>
           <p className="text-xl text-white/95 drop-shadow">
-            Få op til 6.000 kr. i fradrag om året
+            Få op til 18.300 kr. i fradrag om året (2026)
           </p>
         </div>
       </div>
 
       <div className="py-16 bg-white">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 motion-reduce:animate-none animate-slide-in-right">
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 mb-6">
+            <div className="flex gap-3">
+              <Info className="h-6 w-6 text-yellow-700 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-bold text-yellow-900 mb-2">Vigtigt: Du skal selv oplyse servicefradraget</h3>
+                <p className="text-yellow-800">
+                  Vi håndterer ikke servicefradrag for dig. Du skal selv logge på TastSelv og oplyse fradraget. 
+                  Vi leverer kun fakturaen med vores CVR-nummer, som du skal bruge ved oplysning.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white/85 backdrop-blur border border-primary-200 rounded-lg p-6 mb-12">
             <div className="flex gap-3">
               <Info className="h-6 w-6 text-primary-600 flex-shrink-0 mt-1" />
@@ -60,8 +77,9 @@ export default function ServicefradragPage() {
                 <h3 className="font-semibold text-primary-900 mb-2">Hvad er servicefradrag?</h3>
                 <p className="text-primary-800">
                   Servicefradrag er en skattemæssig fordel, der giver dig mulighed for at få 
-                  fradrag for arbejdsløn ved serviceydelser i hjemmet. Du kan få op til 6.000 kr. 
-                  i fradrag om året pr. person.
+                  fradrag for arbejdsløn ved serviceydelser i hjemmet. Du kan få op til 18.300 kr. 
+                  i fradrag om året pr. person i 2026 (17.500 kr. i 2025). Servicefradragets værdi 
+                  er ca. 26%. Hvis du har betalt 1.000 kr. for en serviceydelse, sparer du ca. 260 kr. i skat.
                 </p>
               </div>
             </div>
@@ -98,11 +116,12 @@ export default function ServicefradragPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Betingelser</h2>
           <div className="prose prose-lg max-w-none mb-12">
             <ul className="text-gray-600 space-y-2">
-              <li>Du skal være fyldt 18 år</li>
+              <li>Du skal betale med dankort, MobilePay eller netbank (ikke kontanter)</li>
+              <li>Gem din dokumentation for det udførte arbejde</li>
+              <li>Arbejde, som er udført i 2025, skal være betalt senest 28. februar 2026, for at du kan få fradrag</li>
+              <li>Fradraget gives kun for arbejdsløn - ikke for materialer</li>
               <li>Arbejdet skal udføres i din private bolig eller fritidsbolig i Danmark</li>
-              <li>Du skal betale via bank, MobilePay eller anden sporbar betalingsmetode</li>
-              <li>Virksomheden skal have et dansk CVR-nummer</li>
-              <li>Fradraget gives kun for arbejdsløn, ikke for materialer</li>
+              <li>Du kan ikke få fradrag for abonnementsydelser til fx snerydning og havearbejde</li>
             </ul>
           </div>
 
@@ -110,26 +129,30 @@ export default function ServicefradragPage() {
             <h3 className="text-2xl font-bold mb-4">Vores CVR-nummer</h3>
             <p className="text-4xl font-bold mb-4">{siteConfig.cvr}</p>
             <p className="text-primary-100">
-              Husk at oplyse dette nummer, når du ansøger om servicefradrag
+              Dette nummer findes på din faktura. Du skal selv oplyse det i TastSelv, når du indgiver dit servicefradrag.
             </p>
           </div>
 
           <div className="mt-12 p-6 bg-white/85 backdrop-blur rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-2">Har du spørgsmål?</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Vigtigt at vide</h3>
             <p className="text-gray-600 mb-4">
-              Kontakt os på {siteConfig.phone} eller {siteConfig.email}, så hjælper vi dig 
-              med at få mest muligt ud af dit servicefradrag.
+              <strong>Vi håndterer ikke servicefradrag for dig.</strong> Du skal selv oplyse servicefradraget i TastSelv. 
+              Vi leverer kun fakturaen med vores CVR-nummer, som du skal bruge, når du oplyser fradraget.
             </p>
-            <p className="text-sm text-gray-500">
-              Læs mere om servicefradrag på{" "}
+            <p className="text-gray-600 mb-4">
+              Har du spørgsmål om servicefradrag, kan du kontakte Skat på 72 22 28 28 eller læse mere på{" "}
               <a
-                href="https://skat.dk"
+                href="https://skat.dk/borger/fradrag/servicefradrag/servicefradrag"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-600 hover:text-primary-700"
               >
                 skat.dk
               </a>
+              .
+            </p>
+            <p className="text-gray-600">
+              Har du spørgsmål om vores ydelser, kan du kontakte os på {siteConfig.phone} eller {siteConfig.email}.
             </p>
           </div>
         </div>

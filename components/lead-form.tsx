@@ -253,10 +253,10 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
 
           <div>
-            {variant === "calculator" && selectedServiceId === "tagrender" ? (
+            {selectedServiceId === "tagrender" ? (
               <>
                 <label htmlFor="meters" className="block text-sm font-medium text-gray-700 mb-1">
-                  Vælg antal meter
+                  {variant === "calculator" ? "Vælg antal meter" : "Antal meter (valgfri)"}
                 </label>
                 <input
                   {...register("meters", { valueAsNumber: true })}
