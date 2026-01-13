@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { services } from "@/content/services";
 import { LeadForm } from "@/components/lead-form";
+import { Modal } from "@/components/modal";
 import { Check, X, ShoppingCart } from "lucide-react";
 
 interface SelectedService {
@@ -35,6 +36,7 @@ export default function PakketilbudPage() {
     );
 
     if (exists) {
+      // Remove this specific package
       setSelectedServices(selectedServices.filter(
         (s) => !(s.serviceId === serviceId && s.packageName === packageName)
       ));
@@ -42,18 +44,36 @@ export default function PakketilbudPage() {
       delete newInput[key];
       setSquareMetersInput(newInput);
     } else {
+      // Remove any existing packages from the same service category first
+      const otherServicesInCategory = selectedServices.filter(
+        (s) => s.serviceId === serviceId
+      );
+      const newSelectedServices = selectedServices.filter(
+        (s) => s.serviceId !== serviceId
+      );
+      
+      // Remove square meter inputs for removed packages
+      const newInput = { ...squareMetersInput };
+      otherServicesInCategory.forEach((s) => {
+        const oldKey = `${s.serviceId}-${s.packageName}`;
+        delete newInput[oldKey];
+      });
+      
+      // Add the new package
       const pricePerSqm = extractPricePerSqm(price);
-      const sqm = squareMetersInput[key] || (pricePerSqm ? 50 : undefined);
-      setSelectedServices([...selectedServices, { 
+      const sqm = newInput[key] || (pricePerSqm ? 50 : undefined);
+      setSelectedServices([...newSelectedServices, { 
         serviceId, 
         packageName, 
         price,
         squareMeters: sqm,
         pricePerSqm: pricePerSqm || undefined
       }]);
-      if (pricePerSqm && !squareMetersInput[key]) {
-        setSquareMetersInput({ ...squareMetersInput, [key]: 50 });
+      
+      if (pricePerSqm && !newInput[key]) {
+        newInput[key] = 50;
       }
+      setSquareMetersInput(newInput);
     }
   };
 
@@ -79,9 +99,6 @@ export default function PakketilbudPage() {
   const handleOrderClick = () => {
     if (selectedServices.length > 0) {
       setShowForm(true);
-      setTimeout(() => {
-        document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
     }
   };
 
@@ -264,32 +281,29 @@ export default function PakketilbudPage() {
         </div>
       </div>
 
-      {showForm && (
-        <div className="py-16 bg-gray-50" id="order-form">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl p-8 shadow-xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Indhent tilbud på din pakke</h2>
-              <div className="mb-6 p-4 bg-primary-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2">Valgte services:</h3>
-                <ul className="space-y-1">
-                  {selectedServices.map((selected, index) => {
-                    const service = services.find((s) => s.id === selected.serviceId);
-                    return (
-                      <li key={index} className="text-gray-700">
-                        • {service?.title} - {selected.packageName}
-                        {selected.squareMeters && selected.pricePerSqm && (
-                          <span> ({selected.squareMeters} m²)</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-              <LeadForm type="order" />
-            </div>
-          </div>
+      <Modal
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        title="Indhent tilbud på din pakke"
+      >
+        <div className="mb-6 p-4 bg-primary-50 rounded-lg">
+          <h3 className="font-semibold text-gray-900 mb-2">Valgte services:</h3>
+          <ul className="space-y-1">
+            {selectedServices.map((selected, index) => {
+              const service = services.find((s) => s.id === selected.serviceId);
+              return (
+                <li key={index} className="text-gray-700">
+                  • {service?.title} - {selected.packageName}
+                  {selected.squareMeters && selected.pricePerSqm && (
+                    <span> ({selected.squareMeters} m²)</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      )}
+        <LeadForm type="order" hideServiceSelect={true} />
+      </Modal>
     </>
   );
 }

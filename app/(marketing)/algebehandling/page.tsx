@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { services } from "@/content/services";
 import { LeadForm } from "@/components/lead-form";
+import { Modal } from "@/components/modal";
 import { Check, Star } from "lucide-react";
 
 export default function AlgebehandlingPage() {
@@ -17,9 +18,6 @@ export default function AlgebehandlingPage() {
   const handleSelectPackage = (packageName: string) => {
     setSelectedPackage(packageName);
     setShowForm(true);
-    setTimeout(() => {
-      document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
   };
 
   const benefits = [
@@ -119,28 +117,18 @@ export default function AlgebehandlingPage() {
         </div>
       </div>
 
-      {showForm && (
-        <div className="relative py-16" id="order-form">
-          <div className="absolute inset-0 -z-10">
-            <Image
-              src="/images/alge.png"
-              alt="Algebehandling baggrund"
-              fill
-              className="object-cover"
-              quality={90}
-            />
-          </div>
-          <div className="absolute inset-0 -z-10 bg-black/50" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#1a9b8e] via-[#1a9b8e]/70 to-[#1a9b8e]" />
-          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <LeadForm
-              type="order"
-              defaultService={service.id}
-              defaultPackage={selectedPackage || undefined}
-            />
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        title="Få et uforpligtende tilbud"
+      >
+        <LeadForm
+          type="order"
+          defaultService={service.id}
+          defaultPackage={selectedPackage || undefined}
+          showOnlyM2={true}
+        />
+      </Modal>
     </>
   );
 }
