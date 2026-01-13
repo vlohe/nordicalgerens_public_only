@@ -12,6 +12,7 @@ export function Hero() {
           alt="Nordic Algerens baggrund"
           fill
           className="object-cover"
+          style={{ objectPosition: 'center 20%' }}
           priority
         />
       </div>

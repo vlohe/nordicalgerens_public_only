@@ -12,9 +12,12 @@ interface LeadFormProps {
   defaultPackage?: string;
   type?: "quote" | "callback" | "order";
   variant?: "default" | "calculator";
+  hideServiceSelect?: boolean;
+  hidePackageSelect?: boolean;
+  showOnlyM2?: boolean;
 }
 
-export function LeadForm({ defaultService, defaultPackage, type = "quote", variant = "default" }: LeadFormProps) {
+export function LeadForm({ defaultService, defaultPackage, type = "quote", variant = "default", hideServiceSelect = false, hidePackageSelect = false, showOnlyM2 = false }: LeadFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -49,6 +52,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
   const selectedServiceId = watch("service") as any;
   const selectedService = services.find((s) => s.id === selectedServiceId);
   const selectedPackageName = watch("package") as unknown as string | undefined;
+  const defaultServiceObj = defaultService ? services.find((s) => s.id === defaultService) : null;
   const areaM2Value = watch("areaM2") as unknown as number | undefined;
   const metersValue = watch("meters") as unknown as number | undefined;
 
@@ -95,9 +99,12 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
     if (selectedService.id === "fliser") {
       const pkg = selectedPackageName || "Basis";
       const rate = pkg === "Premium" ? 65 : pkg === "Pro" ? 80 : 50;
+      const startPrice = pkg === "Premium" ? 3250 : pkg === "Pro" ? 4000 : 2500;
       const m2 = typeof areaM2Value === "number" && !Number.isNaN(areaM2Value) ? areaM2Value : 50;
       const totalM2 = Math.max(50, m2);
-      return { label: formatDkk(rate * totalM2), detail: `Beregnet ud fra ${totalM2} m²` };
+      const extraM2 = Math.max(0, totalM2 - 50);
+      const totalPrice = startPrice + (rate * extraM2);
+      return { label: formatDkk(totalPrice), detail: `Startpris ${formatDkk(startPrice)} + ${extraM2 > 0 ? `${extraM2} m² × ${rate},-` : 'inkl. første 50 m²'}` };
     }
 
     if (selectedService.id === "tagrender") {
@@ -169,7 +176,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
   if (isSuccess) {
     return (
       <div className="bg-primary-50 border border-primary-200 rounded-lg p-8 text-center">
-        <h3 className="text-2xl font-bold text-primary-900 mb-4">Tak for din henvendelse!</h3>
+        <h3 className="text-lg font-bold text-primary-900 mb-3">Tak for din henvendelse!</h3>
         <p className="text-primary-800 mb-6">
           Vi har modtaget din besked og vender tilbage hurtigst muligt.
         </p>
@@ -189,7 +196,6 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
         <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 -mt-2">
           <div className="relative inline-flex max-w-[calc(100vw-3rem)] sm:max-w-none sm:whitespace-nowrap">
             <div className="relative rounded-full p-[3px] overflow-hidden">
-              <div className="pointer-events-none absolute inset-0 bg-primary-500/35" />
               <svg
                 className="pointer-events-none absolute inset-0 h-full w-full"
                 viewBox="0 0 100 40"
@@ -225,38 +231,27 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
             </div>
           </div>
         </div>
-      ) : (
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Få et uforpligtende tilbud</h3>
+      ) : null}
+      
+      {showOnlyM2 && defaultServiceObj && (
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          {defaultServiceObj.title}{defaultPackage ? ` "${defaultPackage}"` : ""}
+        </h3>
       )}
       
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-          <div>
-            <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-1">
-              {variant === "calculator" ? "Vælg service" : "Vælg service *"}
-            </label>
-            <select
-              {...register("service")}
-              id="service"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
-            >
-              {services.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {service.title}
-                </option>
-              ))}
-              <option value="andet">Andet</option>
-            </select>
-            {errors.service && (
-              <p className="mt-1 text-sm text-red-600">{errors.service.message}</p>
-            )}
-          </div>
-
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        {(hideServiceSelect || showOnlyM2) && (
+          <input type="hidden" {...register("service")} value={defaultService || "andet"} />
+        )}
+        {showOnlyM2 && defaultPackage && (
+          <input type="hidden" {...register("package")} value={defaultPackage} />
+        )}
+        {showOnlyM2 ? (
           <div>
             {selectedServiceId === "tagrender" ? (
               <>
-                <label htmlFor="meters" className="block text-sm font-medium text-gray-700 mb-1">
-                  {variant === "calculator" ? "Vælg antal meter" : "Antal meter (valgfri)"}
+                <label htmlFor="meters" className="block text-xs font-medium text-gray-700 mb-1">
+                  Antal meter (valgfri)
                 </label>
                 <input
                   {...register("meters", { valueAsNumber: true })}
@@ -264,7 +259,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
                   inputMode="numeric"
                   id="meters"
                   min={1}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+                  className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
                 />
                 {errors.meters && (
                   <p className="mt-1 text-sm text-red-600">{errors.meters.message as any}</p>
@@ -272,8 +267,8 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
               </>
             ) : (
               <>
-                <label htmlFor="areaM2" className="block text-sm font-medium text-gray-700 mb-1">
-                  {variant === "calculator" ? "Vælg antal m2" : "Antal m² (valgfri)"}
+                <label htmlFor="areaM2" className="block text-xs font-medium text-gray-700 mb-1">
+                  Antal m² (valgfri)
                 </label>
                 <input
                   {...register("areaM2", { valueAsNumber: true })}
@@ -281,7 +276,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
                   inputMode="numeric"
                   id="areaM2"
                   min={selectedServiceId === "fliser" ? 50 : 1}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+                  className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
                 />
 
                 {errors.areaM2 && (
@@ -290,17 +285,83 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
               </>
             )}
           </div>
-        </div>
+        ) : (
+          <div className={`grid grid-cols-1 ${hideServiceSelect ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-2 sm:gap-3`}>
+            {!hideServiceSelect && (
+              <div>
+                <label htmlFor="service" className="block text-xs font-medium text-gray-700 mb-1">
+                  {variant === "calculator" ? "Vælg service" : "Vælg service *"}
+                </label>
+                <select
+                  {...register("service")}
+                  id="service"
+                  className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
+                >
+                  {services.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.title}
+                    </option>
+                  ))}
+                  <option value="andet">Andet</option>
+                </select>
+                {errors.service && (
+                  <p className="mt-1 text-sm text-red-600">{errors.service.message}</p>
+                )}
+              </div>
+            )}
 
-        {variant === "calculator" && ["fliser", "tagrender", "edderkopper"].includes(selectedServiceId) && (
+            {!hideServiceSelect && (
+              <div>
+                {selectedServiceId === "tagrender" ? (
+                  <>
+                    <label htmlFor="meters" className="block text-xs font-medium text-gray-700 mb-1">
+                      {variant === "calculator" ? "Vælg antal meter" : "Antal meter (valgfri)"}
+                    </label>
+                    <input
+                      {...register("meters", { valueAsNumber: true })}
+                      type="number"
+                      inputMode="numeric"
+                      id="meters"
+                      min={1}
+                      className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                    {errors.meters && (
+                      <p className="mt-1 text-sm text-red-600">{errors.meters.message as any}</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <label htmlFor="areaM2" className="block text-xs font-medium text-gray-700 mb-1">
+                      {variant === "calculator" ? "Vælg antal m2" : "Antal m² (valgfri)"}
+                    </label>
+                    <input
+                      {...register("areaM2", { valueAsNumber: true })}
+                      type="number"
+                      inputMode="numeric"
+                      id="areaM2"
+                      min={selectedServiceId === "fliser" ? 50 : 1}
+                      className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+
+                    {errors.areaM2 && (
+                      <p className="mt-1 text-sm text-red-600">{errors.areaM2.message as any}</p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {variant === "calculator" && ["fliser", "tagrender", "edderkopper"].includes(selectedServiceId) && !hideServiceSelect && !hidePackageSelect && !showOnlyM2 && (
           <div>
-            <label htmlFor="package" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="package" className="block text-xs font-medium text-gray-700 mb-1">
               Vælg pakke
             </label>
             <select
               {...register("package")}
               id="package"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             >
               {selectedService?.packages.map((pkg) => (
                 <option key={pkg.name} value={pkg.name}>
@@ -313,10 +374,10 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
 
         {variant === "calculator" && estimate && (
           <div className="rounded-lg border border-primary-200 bg-primary-50 p-3">
-            <div className="text-sm font-semibold text-primary-900">Estimeret pris</div>
-            <div className="mt-1 flex flex-col md:flex-row md:items-start md:gap-5">
+            <div className="text-xs font-semibold text-primary-900">Estimeret pris</div>
+            <div className="mt-1 flex flex-col md:flex-row md:items-start md:gap-4">
               <div className="md:flex-1">
-                <div className="text-xl font-bold text-primary-900">{estimate.label}</div>
+                <div className="text-base font-bold text-primary-900">{estimate.label}</div>
                 {estimate.detail && (
                   <div className="mt-1 text-xs text-primary-800">{estimate.detail}</div>
                 )}
@@ -337,22 +398,24 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
         )}
 
-        {variant === "calculator" && (
+        {variant === "calculator" && selectedService && (
           <div className="pt-2">
-            <h3 className="text-lg font-bold text-gray-900">Få et uforpligtende tilbud</h3>
+            <h3 className="text-base font-bold text-gray-900">
+              {selectedService.title}{selectedPackageName ? ` "${selectedPackageName}"` : ""}
+            </h3>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1">
               Navn *
             </label>
             <input
               {...register("name")}
               type="text"
               id="name"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -360,14 +423,14 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1">
               Email *
             </label>
             <input
               {...register("email")}
               type="email"
               id="email"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -375,14 +438,14 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-xs font-medium text-gray-700 mb-1">
               Telefon *
             </label>
             <input
               {...register("phone")}
               type="tel"
               id="phone"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
             {errors.phone && (
               <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
@@ -390,14 +453,14 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
 
           <div>
-            <label htmlFor="zip" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="zip" className="block text-xs font-medium text-gray-700 mb-1">
               Postnummer *
             </label>
             <input
               {...register("zip")}
               type="text"
               id="zip"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
             {errors.zip && (
               <p className="mt-1 text-sm text-red-600">{errors.zip.message}</p>
@@ -405,14 +468,14 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="address" className="block text-xs font-medium text-gray-700 mb-1">
               Adresse
             </label>
             <input
               {...register("address")}
               type="text"
               id="address"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
             {errors.address && (
               <p className="mt-1 text-sm text-red-600">{errors.address.message as any}</p>
@@ -420,15 +483,15 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
           </div>
         </div>
 
-        {variant !== "calculator" && (
+        {variant !== "calculator" && !hideServiceSelect && !hidePackageSelect && !showOnlyM2 && (
           <div>
-            <label htmlFor="package" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="package" className="block text-xs font-medium text-gray-700 mb-1">
               Vælg pakke (valgfri)
             </label>
             <select
               {...register("package")}
               id="package"
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             >
               <option value="">Vælg pakke...</option>
               {selectedService?.packages.map((pkg) => (
@@ -442,14 +505,14 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
 
         {variant !== "calculator" && (
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1">
               Besked (valgfri)
             </label>
             <textarea
               {...register("message")}
               id="message"
-              rows={4}
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-primary-500 focus:ring-primary-500"
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:ring-primary-500"
             />
           </div>
         )}
@@ -461,7 +524,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
             id="consent"
             className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
-          <label htmlFor="consent" className="text-sm text-gray-700">
+          <label htmlFor="consent" className="text-xs text-gray-700">
             Jeg accepterer at Nordic Algerens kontakter mig vedrørende min henvendelse *
           </label>
         </div>
@@ -472,7 +535,7 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-primary-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary-600 text-white py-2 px-4 rounded-md text-sm font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
@@ -486,5 +549,4 @@ export function LeadForm({ defaultService, defaultPackage, type = "quote", varia
       </form>
     </div>
   );
-
 }

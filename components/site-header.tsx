@@ -62,12 +62,10 @@ export function SiteHeader() {
   return (
     <header className={headerClassName}>
       <div className="relative">
-        {/* Blur background for navbar */}
-        <div className="absolute inset-0 backdrop-blur-md"></div>
-        {/* Fade-out blur effect below navbar only */}
-        <div className="absolute top-full left-0 right-0 h-6 backdrop-blur-md pointer-events-none" style={{
-          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.5) 65%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.15) 90%, rgba(0,0,0,0.05) 95%, rgba(0,0,0,0) 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.5) 65%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.15) 90%, rgba(0,0,0,0.05) 95%, rgba(0,0,0,0) 100%)'
+        {/* Blur background for navbar with fade-out at bottom */}
+        <div className="absolute inset-0 backdrop-blur-md pb-6 z-0" style={{
+          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 75%, rgba(0,0,0,0.99) 80%, rgba(0,0,0,0.97) 84%, rgba(0,0,0,0.94) 87%, rgba(0,0,0,0.9) 90%, rgba(0,0,0,0.85) 92%, rgba(0,0,0,0.78) 94%, rgba(0,0,0,0.7) 95.5%, rgba(0,0,0,0.6) 96.5%, rgba(0,0,0,0.5) 97.5%, rgba(0,0,0,0.4) 98.2%, rgba(0,0,0,0.3) 98.7%, rgba(0,0,0,0.22) 99%, rgba(0,0,0,0.15) 99.3%, rgba(0,0,0,0.1) 99.5%, rgba(0,0,0,0.06) 99.7%, rgba(0,0,0,0.03) 99.85%, rgba(0,0,0,0.01) 99.95%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 75%, rgba(0,0,0,0.99) 80%, rgba(0,0,0,0.97) 84%, rgba(0,0,0,0.94) 87%, rgba(0,0,0,0.9) 90%, rgba(0,0,0,0.85) 92%, rgba(0,0,0,0.78) 94%, rgba(0,0,0,0.7) 95.5%, rgba(0,0,0,0.6) 96.5%, rgba(0,0,0,0.5) 97.5%, rgba(0,0,0,0.4) 98.2%, rgba(0,0,0,0.3) 98.7%, rgba(0,0,0,0.22) 99%, rgba(0,0,0,0.15) 99.3%, rgba(0,0,0,0.1) 99.5%, rgba(0,0,0,0.06) 99.7%, rgba(0,0,0,0.03) 99.85%, rgba(0,0,0,0.01) 99.95%, rgba(0,0,0,0) 100%)'
         }}></div>
         {/* Navbar content on top */}
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20" aria-label="Top">
